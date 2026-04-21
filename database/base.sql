@@ -4,6 +4,7 @@
 
 CREATE TABLE persona (
     id_persona SERIAL PRIMARY KEY,
+    estado VARCHAR(20) DEFAULT 'Activo' CHECK (estado IN ('Activo','Inactivo')),
     tipo_documento_identidad VARCHAR(2) NOT NULL CHECK (tipo_documento_identidad IN ('CC','TI','CE','PA')),
     numero_documento_identidad VARCHAR(20) NOT NULL UNIQUE,
     nombres VARCHAR(50) NOT NULL,
@@ -229,3 +230,37 @@ CREATE TABLE conducta (
     FOREIGN KEY (id_matricula) REFERENCES matricula(id_matricula) ON DELETE SET NULL,
     FOREIGN KEY (id_periodo) REFERENCES periodo(id_periodo) ON DELETE SET NULL
 );
+
+-- =========================
+-- DATOS SEMILLA: DOCENTES
+-- =========================
+
+INSERT INTO persona (
+    estado,
+    tipo_documento_identidad,
+    numero_documento_identidad,
+    nombres,
+    apellidos,
+    fecha_nacimiento,
+    estado_civil,
+    pais_residencia,
+    departamento_residencia,
+    ciudad_residencia,
+    direccion,
+    telefono,
+    email,
+    tipo_sangre
+) VALUES
+('Activo', 'CC', '101001001', 'Carlos Andres', 'Ramirez Gomez', '1985-06-12', 'Casado', 'Colombia', 'Cundinamarca', 'Bogota', 'Calle 10 #20-30', '3001112233', 'carlos.ramirez@cefup.edu.co', 'O+'),
+('Activo', 'CC', '101001002', 'Laura Marcela', 'Pineda Torres', '1990-03-08', 'Soltero', 'Colombia', 'Antioquia', 'Medellin', 'Carrera 45 #12-90', '3002223344', 'laura.pineda@cefup.edu.co', 'A+'),
+('Activo', 'CC', '101001003', 'Jorge Ivan', 'Moreno Diaz', '1982-11-23', 'Union Libre', 'Colombia', 'Valle del Cauca', 'Cali', 'Avenida 5 #33-44', '3003334455', 'jorge.moreno@cefup.edu.co', 'B+');
+
+INSERT INTO docente (
+    id_persona,
+    ultimo_titulo_profesional,
+    actual_cargo,
+    fecha_contratacion
+) VALUES
+((SELECT id_persona FROM persona WHERE numero_documento_identidad = '101001001'), 'Licenciatura en Matematicas', 'Docente de Matematicas', '2021-01-18'),
+((SELECT id_persona FROM persona WHERE numero_documento_identidad = '101001002'), 'Licenciatura en Lengua Castellana', 'Docente de Lenguaje', '2022-02-01'),
+((SELECT id_persona FROM persona WHERE numero_documento_identidad = '101001003'), 'Licenciatura en Ciencias Sociales', 'Docente de Sociales', '2020-07-15');
