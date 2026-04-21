@@ -28,26 +28,22 @@ zip -r gestion-docentes.zip \
 
 - Python 3.10+
 - Node.js 18+ y npm
-- MySQL 8+
+- Git
+- MySQL 8+ solo si quieres usar esa base en lugar de SQLite
 
-## 2) Base de datos
+## 2) Primer arranque desde cero
 
-1. Crear la base de datos `cefup_db` en MySQL.
-2. Ejecutar el script SQL base:
+Si alguien clona el repositorio desde cero, no necesita preparar MySQL para levantar el proyecto en desarrollo.
+El backend usa SQLite por defecto y crea la base local automáticamente en `backend/cefup_dev.db`.
 
-```bash
-mysql -u root -p cefup_db < database/base.sql
-```
-
-> Nota: la conexion del backend esta configurada en `backend/app/core/database.py` como:
-> `mysql+pymysql://root@localhost:3306/cefup_db`
-> Ajusta usuario, password o host segun tu entorno.
+Los datos de docentes se cargan solos al iniciar la API si la base está vacía.
 
 ## 3) Levantar backend (FastAPI)
 
-Desde la carpeta `backend/`:
+Desde la raíz del proyecto o desde `backend/`:
 
 ```bash
+cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install fastapi "uvicorn[standard]" sqlalchemy pymysql
@@ -56,14 +52,15 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 Backend disponible en:
 
-- API: http://localhost:8000
-- Docs Swagger: http://localhost:8000/docs
+ - API: http://localhost:8000
+ - Docs Swagger: http://localhost:8000/docs
 
 ## 4) Levantar frontend (React)
 
-Desde la carpeta `frontend/`:
+Desde `frontend/`:
 
 ```bash
+cd frontend
 npm install
 npm start
 ```
@@ -72,8 +69,23 @@ Frontend disponible en:
 
 - http://localhost:3000
 
-## 5) Orden recomendado
+## 5) Uso opcional con MySQL
 
-1. Inicia MySQL.
-2. Inicia backend.
-3. Inicia frontend.
+Si quieres usar MySQL en vez de SQLite, exporta estas variables antes de arrancar el backend:
+
+```bash
+export DB_DRIVER=mysql
+export DB_USER=cefup
+export DB_PASSWORD=cefup123
+export DB_HOST=localhost
+export DB_PORT=3306
+export DB_NAME=cefup_db
+```
+
+Luego crea la base y carga el script SQL manualmente.
+
+## 6) Orden recomendado
+
+1. Inicia el backend.
+2. Inicia el frontend.
+3. Abre http://localhost:3000
