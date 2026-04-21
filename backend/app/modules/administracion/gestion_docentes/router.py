@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from datetime import date
 
 # Importaciones locales
 from app.core.database import get_db
@@ -61,6 +62,17 @@ def actualizar_persona(id_persona: int, payload: dict, db: Session = Depends(get
         'estado_civil','pais_residencia','departamento_residencia','ciudad_residencia','direccion','telefono','email','tipo_sangre'
     ]}
     docente_fields = {k: v for k, v in payload.items() if k in ['ultimo_titulo_profesional','actual_cargo','fecha_contratacion']}
+
+    # SQLite exige objetos date para columnas DATE (no strings).
+    if isinstance(persona_fields.get('fecha_nacimiento'), str) and persona_fields['fecha_nacimiento'].strip():
+        persona_fields['fecha_nacimiento'] = date.fromisoformat(persona_fields['fecha_nacimiento'])
+    if persona_fields.get('fecha_nacimiento') == '':
+        persona_fields['fecha_nacimiento'] = None
+
+    if isinstance(docente_fields.get('fecha_contratacion'), str) and docente_fields['fecha_contratacion'].strip():
+        docente_fields['fecha_contratacion'] = date.fromisoformat(docente_fields['fecha_contratacion'])
+    if docente_fields.get('fecha_contratacion') == '':
+        docente_fields['fecha_contratacion'] = None
 
     updated = service.actualizar_docente(db=db, id_persona=id_persona, persona_data=persona_fields, docente_data=docente_fields)
     if not updated:
